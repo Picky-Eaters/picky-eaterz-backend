@@ -1,0 +1,23 @@
+{
+  "name": "picky-eaterz-backend",
+  "version": "1.0.0",
+  "description": "The backend for the Picky Eaterz app",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Picky-Eaters/picky-eaterz-backend.git"
+  },
+  "author": "Picky Eaterz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Picky-Eaters/picky-eaterz-backend/issues"
+  },
+  "homepage": "https://github.com/Picky-Eaters/picky-eaterz-backend#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
