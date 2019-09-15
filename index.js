@@ -17,7 +17,7 @@ const corsOptions = {
 
 // Initialize the express server.
 const app = express();
-app.use(cors(corsOptions), express.json());
+app.use(cors());
 
 // Retrieve the service account credentials and initialize the Firebase admin SDK.
 admin.initializeApp({
@@ -118,8 +118,9 @@ app.get('/groups/:gid', async (req, res) => {
   const gid = req.params.gid.toLowerCase();
 
   const snap = await database.ref(gid).child("restaurants").once("value");
-  if (!snap.exists) {
+  if (!snap.exists()) {
     res.status(404).end();
+    return;
   }
 
   res.status(200).send(snap.val());
@@ -156,21 +157,25 @@ app.delete('/groups/:gid', async (req, res) => {
   const gid = req.params.gid.toLowerCase();
 
   database.ref(gid).remove();
-  res.end();
+  res.status(200).end();
 });
 
 // Updates the restaurant with the given restaurant ID in the group with the given group ID with one more vote.
 app.put('/groups/:gid/:rid', async (req, res) => {
   // Retrieve the GID and RID from the request URL.
   const gid = req.params.gid.toLowerCase();
-  const rid = req.params.rid.toLowerCase();
+  const rid = req.params.rid;
 
   // Update the restaurant vote value.
   const votesRef = database.ref(gid).child("restaurants").child(rid).child("votes");
   var votes = await votesRef.once("value");
-  votesRef.set(votes.val() + 1);
+  if (!votes.exists()) {
+    res.status(404).end();
+    return;
+  }
 
-  res.end();
+  votesRef.set(votes.val() + 1);
+  res.status(200).end();
 });
 
 const PORT = process.env.PORT || 8080;
