@@ -145,9 +145,13 @@ app.get('/groups/realtime/:gid', async (req, res) => {
   });
 
   database.ref(gid).child("restaurants").on("value", (snap) => {
-    const val = snap.val();
-    res.write(`data: ${JSON.stringify(val)}`);
-    res.write("\n\n");
+    if (!res.finished) {
+      const val = snap.val();
+      res.write(`data: ${JSON.stringify(val)}`);
+      res.write("\n\n");
+    } else {
+      return;
+    }
   });
 });
 
