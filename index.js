@@ -1,9 +1,23 @@
+'use strict';
+
 const express = require('express');
 const axios = require('axios');
 const admin = require('firebase-admin');
+const cors = require('cors');
 const config = require('./config.json');
 const serviceAccount = require('./service-account.json');
+
+// CORS variables, for use with express.
+const whitelist = ['http://localhost:3000', 'https://picky-eaterz.appspot.com'];
+const corsOptions = {
+  origin: (origin, callback) => {
+    whitelist.indexOf(origin) > -1 ? callback(null, true) : callback(new Error('Request denied by CORS'));
+  }
+};
+
+// Initialize the express server.
 const app = express();
+app.use(cors(corsOptions), express.json());
 
 // Retrieve the service account credentials and initialize the Firebase admin SDK.
 admin.initializeApp({
@@ -72,8 +86,8 @@ app.post('/groups/create', async (req, res) => {
   const results = await axios.get(yelpUrl, { params, headers });
 
   // Map the returned business to new objects, keeping only the data we need.
-  const restaurants = results.data.businesses.map(place => {
-    return {
+  const restaurants = results.data.businesses.reduce((map, place) => {
+    map[place.id] = {
       "categories": place.categories.map(category => {
         return category.title
       }),
@@ -82,10 +96,13 @@ app.post('/groups/create', async (req, res) => {
       "price": place.price,
       "rating": place.rating,
       "review_count": place.review_count,
+      "image_url": place.image_url,
       "url": place.url,
       "votes": 0
     };
-  });
+
+    return map;
+  }, {});
 
   // Create the new group.
   const gid = await findGID();
@@ -93,6 +110,63 @@ app.post('/groups/create', async (req, res) => {
 
   // Respond with a success code and the group ID.
   res.status(200).send(gid);
+});
+
+// Gets information regarding all of the restaurants in a given group.
+app.get('/groups/:gid', async (req, res) => {
+  // Retreive the group ID from the request URL.
+  const gid = req.params.gid.toLowerCase();
+
+  const snap = await database.ref(gid).child("restaurants").once("value");
+  res.status(200).send(snap.val());
+});
+
+// Gets realtime information regarding the restaurants in a given group.
+app.get('/groups/realtime/:gid', async (req, res) => {
+  // Retreive the group ID from the request URL.
+  const gid = req.params.gid.toLowerCase();
+
+  req.on("close", () => {
+    if (!res.finished) {
+      res.end();
+      console.log("Killed response events");
+    }
+  });
+
+  res.writeHead(200, {
+    "Connection": "keep-alive",
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache"
+  });
+
+  database.ref(gid).child("restaurants").on("value", (snap) => {
+    const val = snap.val();
+    res.write(`data: ${JSON.stringify(val)}`);
+    res.write("\n\n");
+  });
+});
+
+// Deletes the group with the given group ID.
+app.delete('/groups/:gid', async (req, res) => {
+  // Retreive the group ID from the request URL.
+  const gid = req.params.gid.toLowerCase();
+
+  database.ref(gid).remove();
+  res.end();
+});
+
+// Updates the restaurant with the given restaurant ID in the group with the given group ID with one more vote.
+app.put('/groups/:gid/:rid', async (req, res) => {
+  // Retreive the GID and RID from the request URL.
+  const gid = req.params.gid.toLowerCase();
+  const rid = req.params.rid.toLowerCase();
+
+  // Update the restaurant vote value.
+  const votesRef = database.ref(gid).child("restaurants").child(rid).child("votes");
+  var votes = await votesRef.once("value");
+  votesRef.set(votes.val() + 1);
+
+  res.end();
 });
 
 const PORT = process.env.PORT || 8080;
