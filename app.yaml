@@ -1,3 +1,8 @@
 runtime: nodejs10
 
 service: picky-eaterz-backend
+
+handler:
+  - url: /*
+    http_headers:
+      Access-Control-Allow-Origin: *
