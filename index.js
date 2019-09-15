@@ -131,6 +131,7 @@ app.get('/groups/realtime/:gid', async (req, res) => {
   });
 
   res.writeHead(200, {
+    "Access-Control-Allow-Origin": "*",
     "Connection": "keep-alive",
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache"
