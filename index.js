@@ -118,6 +118,10 @@ app.get('/groups/:gid', async (req, res) => {
   const gid = req.params.gid.toLowerCase();
 
   const snap = await database.ref(gid).child("restaurants").once("value");
+  if (!snap.exists) {
+    res.status(404).end();
+  }
+
   res.status(200).send(snap.val());
 });
 
