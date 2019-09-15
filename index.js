@@ -1,14 +1,14 @@
 'use strict';
 
-const express = require('express');
-const axios = require('axios');
-const admin = require('firebase-admin');
-const cors = require('cors');
-const config = require('./config.json');
-const serviceAccount = require('./service-account.json');
+var express = require('express');
+var axios = require('axios');
+var admin = require('firebase-admin');
+var cors = require('cors');
+var config = require('./config.json');
+var serviceAccount = require('./service-account.json');
 
 // Initialize the express server.
-const app = express();
+var app = express();
 app.use(cors());
 
 // Retrieve the service account credentials and initialize the Firebase admin SDK.
@@ -48,7 +48,7 @@ const findGID = async () => {
 }
 
 // Creates a new group.
-app.post('/groups/create', cors(), async (req, res) => {
+app.post('/groups/create', async (req, res) => {
   // Retrieve the query parameters.
   const term = "food";
   const location = req.query.location;
@@ -105,7 +105,7 @@ app.post('/groups/create', cors(), async (req, res) => {
 });
 
 // Gets information regarding all of the restaurants in a given group.
-app.get('/groups/:gid', cors(), async (req, res) => {
+app.get('/groups/:gid', async (req, res) => {
   // Retrieve the group ID from the request URL.
   const gid = req.params.gid.toLowerCase();
 
@@ -119,7 +119,7 @@ app.get('/groups/:gid', cors(), async (req, res) => {
 });
 
 // Gets realtime information regarding the restaurants in a given group.
-app.get('/groups/realtime/:gid', cors(), async (req, res) => {
+app.get('/groups/realtime/:gid', async (req, res) => {
   // Retrieve the group ID from the request URL.
   const gid = req.params.gid.toLowerCase();
 
@@ -148,7 +148,7 @@ app.get('/groups/realtime/:gid', cors(), async (req, res) => {
 });
 
 // Deletes the group with the given group ID.
-app.delete('/groups/:gid', cors(), async (req, res) => {
+app.delete('/groups/:gid', async (req, res) => {
   // Retrieve the group ID from the request URL.
   const gid = req.params.gid.toLowerCase();
 
@@ -157,7 +157,7 @@ app.delete('/groups/:gid', cors(), async (req, res) => {
 });
 
 // Updates the restaurant with the given restaurant ID in the group with the given group ID with one more vote.
-app.put('/groups/:gid/:rid', cors(), async (req, res) => {
+app.put('/groups/:gid/:rid', async (req, res) => {
   // Retrieve the GID and RID from the request URL.
   const gid = req.params.gid.toLowerCase();
   const rid = req.params.rid;
