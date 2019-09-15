@@ -114,7 +114,7 @@ app.post('/groups/create', async (req, res) => {
 
 // Gets information regarding all of the restaurants in a given group.
 app.get('/groups/:gid', async (req, res) => {
-  // Retreive the group ID from the request URL.
+  // Retrieve the group ID from the request URL.
   const gid = req.params.gid.toLowerCase();
 
   const snap = await database.ref(gid).child("restaurants").once("value");
@@ -123,7 +123,7 @@ app.get('/groups/:gid', async (req, res) => {
 
 // Gets realtime information regarding the restaurants in a given group.
 app.get('/groups/realtime/:gid', async (req, res) => {
-  // Retreive the group ID from the request URL.
+  // Retrieve the group ID from the request URL.
   const gid = req.params.gid.toLowerCase();
 
   req.on("close", () => {
@@ -148,7 +148,7 @@ app.get('/groups/realtime/:gid', async (req, res) => {
 
 // Deletes the group with the given group ID.
 app.delete('/groups/:gid', async (req, res) => {
-  // Retreive the group ID from the request URL.
+  // Retrieve the group ID from the request URL.
   const gid = req.params.gid.toLowerCase();
 
   database.ref(gid).remove();
@@ -157,7 +157,7 @@ app.delete('/groups/:gid', async (req, res) => {
 
 // Updates the restaurant with the given restaurant ID in the group with the given group ID with one more vote.
 app.put('/groups/:gid/:rid', async (req, res) => {
-  // Retreive the GID and RID from the request URL.
+  // Retrieve the GID and RID from the request URL.
   const gid = req.params.gid.toLowerCase();
   const rid = req.params.rid.toLowerCase();
 
