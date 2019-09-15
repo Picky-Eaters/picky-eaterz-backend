@@ -25,7 +25,7 @@ const generateGID = () => {
   var chars = [];
 
   for (var i = 0; i < 6; i++) {
-    const rand = Math.floor(Math.random() * 37);
+    const rand = Math.floor(Math.random() * 36);
     chars[i] = rand < 10 ? rand + 48 : rand + 87;
   }
 
